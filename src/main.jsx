@@ -8,6 +8,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* <App /> */}
     <StarRating maxRating={5}/>
-    <StarRating maxRating={10}/>
+
   </React.StrictMode>,
 )
