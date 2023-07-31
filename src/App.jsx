@@ -68,12 +68,13 @@ export default function App() {
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMovieList watched={watched} />
-          //
         </Box>
       </Main>
     </>
   );
 }
+
+
 
 function NavBar({ children }) {
   return <nav className="nav-bar">{children}</nav>;
