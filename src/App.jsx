@@ -80,12 +80,17 @@ export default function App() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    //this AbortConttoller is so that it cancels the fetches
+    //that happen before user is done typing
+    const controller = new AbortController();
+
+    const fetchMovies = async () => {
       try {
         setIsLoading(true);
         setError("");
         const res = await axios.get(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+          { signal: controller.signal }
         );
 
         if (res.status !== 200) {
@@ -97,8 +102,12 @@ export default function App() {
         }
 
         setMovies(res.data.Search);
+        setError("");
       } catch (err) {
-        setError(err.message);
+        // console.log("<<<<", err.name);
+        if (err.name !== "AbortError" || err.name !== "CanceledError") {
+          setError(err.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -110,7 +119,14 @@ export default function App() {
       return;
     }
 
-    fetchData();
+    //this will close it whenever a new search is typed
+    handleCloseMovie();
+
+    fetchMovies();
+
+    return () => {
+      controller.abort();
+    };
   }, [query]);
 
   return (
@@ -285,12 +301,26 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   };
 
   useEffect(() => {
+    const callback = (e) => {
+      if (e.code === "Escape") {
+        onCloseMovie();
+      }
+    };
+
+    document.addEventListener("keydown", callback);
+
+    return () => {
+      document.removeEventListener("keydown", callback);
+    };
+  }, []);
+
+  useEffect(() => {
     const getMovieDetails = async () => {
       setIsLoading(true);
       const res = await axios.get(
         `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
       );
-      console.log(res.data);
+      // console.log(res.data);
       setMovie(res.data);
       setIsLoading(false);
     };
@@ -300,6 +330,12 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   useEffect(() => {
     if (!title) return;
     document.title = `Movie | ${title}`;
+
+    //this is the cleanup function, when we unmount our component
+    //it will go back to default
+    return () => {
+      document.title = "usePopcorn";
+    };
   }, [title]);
 
   return (
