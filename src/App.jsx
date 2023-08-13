@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import axios from "axios";
 import StarRating from "./StarRating";
+import { useMovies } from "./useMovies";
 
 const tempMovieData = [
   {
@@ -56,91 +57,39 @@ const average = (arr) =>
 const KEY = "1eb0ec4a";
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  // const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
+  const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
   //pass a function React can call later
   //for now using useEffect to get the local stoarge stuff
   //then the state gets updated and parsed so it can read it
-  const [watched, setWatched] = useState(() => {
+  const [watched, setWatched] = useState(function () {
     const storedValue = localStorage.getItem("watched");
     return JSON.parse(storedValue);
   });
 
-  const handleSelectMovie = (id) => {
+  function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
-  };
+  }
 
-  const handleCloseMovie = () => {
+  function handleCloseMovie() {
     setSelectedId(null);
-  };
+  }
 
-  const handleAddWatched = (movie) => {
+  function handleAddWatched(movie) {
     setWatched((prev) => [...prev, movie]);
-  };
+  }
 
-  const handleDeleteWatched = (id) => {
+  function handleDeleteWatched(id) {
     setWatched((prev) => prev.filter((prev) => prev.imdbID !== id));
-  };
+  }
 
   //here we set the item as opposed to get item
   useEffect(() => {
     localStorage.setItem("watched", JSON.stringify(watched));
   }, [watched]);
-
-  useEffect(() => {
-    //this AbortConttoller is so that it cancels the fetches
-    //that happen before user is done typing
-    const controller = new AbortController();
-
-    const fetchMovies = async () => {
-      try {
-        setIsLoading(true);
-        setError("");
-        const res = await axios.get(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-          { signal: controller.signal }
-        );
-
-        if (res.status !== 200) {
-          throw new Error("Something wrong with fetching movies manggg");
-        }
-
-        if (res.data.Response === "False") {
-          throw new Error("Movie not found");
-        }
-
-        setMovies(res.data.Search);
-        setError("");
-      } catch (err) {
-        // console.log("<<<<", err.name);
-        if (err.name !== "AbortError" || err.name !== "CanceledError") {
-          setError(err.message);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (query.length < 3) {
-      setMovies([]);
-      setError("");
-      return;
-    }
-
-    //this will close it whenever a new search is typed
-    handleCloseMovie();
-
-    fetchMovies();
-
-    return () => {
-      controller.abort();
-    };
-  }, [query]);
 
   return (
     <>
