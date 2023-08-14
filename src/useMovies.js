@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const KEY = "1eb0ec4a";
 
@@ -8,6 +10,7 @@ export function useMovies(query, callback) {
   // const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fetchCompleted, setFetchCompleted] = useState(false);
   useEffect(() => {
     //this AbortConttoller is so that it cancels the fetches
     //that happen before user is done typing
@@ -41,6 +44,7 @@ export function useMovies(query, callback) {
         }
       } finally {
         setIsLoading(false);
+        setFetchCompleted(true);
       }
     }
 
@@ -59,6 +63,14 @@ export function useMovies(query, callback) {
       controller.abort();
     };
   }, [query]);
+
+  useEffect(() => {
+    if (fetchCompleted) {
+      toast.success(
+        "Movies are fetched via REST API (omdbapi.com), currently using Axios for fetching"
+      );
+    }
+  }, [fetchCompleted]);
 
   return { movies, isLoading, error };
 }
