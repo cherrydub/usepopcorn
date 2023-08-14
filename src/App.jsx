@@ -93,6 +93,19 @@ export default function App() {
 
   //here we set the item as opposed to get item
   useEffect(() => {
+    toast.info(
+      `Welcome to my React Project built via Vite
+      This web app will highlight varios react hooks (useState, useEffect, useRef, custom hooks)
+      Various components, composition, re-usability
+      Data fetching REST APIs, using Axios for this project
+      Using LocalStorage for storing watched movies, Enjoy :)
+      `,
+      {
+        closeOnClick: true,
+        pauseOnHover: true,
+        position: "top-center",
+      }
+    );
     localStorage.setItem("watched", JSON.stringify(watched));
   }, [watched]);
 
