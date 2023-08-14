@@ -3,6 +3,8 @@ import "./App.css";
 import axios from "axios";
 import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const tempMovieData = [
   {
@@ -79,6 +81,9 @@ export default function App() {
   }
 
   function handleAddWatched(movie) {
+    toast.info(
+      "Watched movies stored in LocalStorage, you can refresh or close site. List will remain"
+    );
     setWatched((prev) => [...prev, movie]);
   }
 
@@ -153,7 +158,7 @@ function Logo() {
   return (
     <div className="logo">
       <span role="img">🍿</span>
-      <h1>usePopcorn</h1>
+      <h1>Popcorn Time</h1>
     </div>
   );
 }
@@ -321,7 +326,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     //this is the cleanup function, when we unmount our component
     //it will go back to default
     return () => {
-      document.title = "usePopcorn";
+      document.title = "Popcorn Time";
     };
   }, [title]);
 
