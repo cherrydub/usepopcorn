@@ -5,6 +5,7 @@ import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 const tempMovieData = [
   {
@@ -64,13 +65,15 @@ export default function App() {
 
   const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
+  const [watched, setWatched] = useLocalStorageState([], "watched");
+
   //pass a function React can call later
   //for now using useEffect to get the local stoarge stuff
   //then the state gets updated and parsed so it can read it
-  const [watched, setWatched] = useState(function () {
-    const storedValue = localStorage.getItem("watched");
-    return storedValue ? JSON.parse(storedValue) : [];
-  });
+  // const [watched, setWatched] = useState(function () {
+  //   const storedValue = localStorage.getItem("watched");
+  //   return storedValue ? JSON.parse(storedValue) : [];
+  // });
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -92,9 +95,9 @@ export default function App() {
   }
 
   //here we set the item as opposed to get item
-  useEffect(() => {
-    localStorage.setItem("watched", JSON.stringify(watched));
-  }, [watched]);
+  // useEffect(() => {
+  //   localStorage.setItem("watched", JSON.stringify(watched));
+  // }, [watched]);
 
   useEffect(() => {
     toast.info(
