@@ -6,6 +6,7 @@ import { useMovies } from "./useMovies";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocalStorageState } from "./useLocalStorageState";
+import { useKey } from "./useKey";
 
 const tempMovieData = [
   {
@@ -193,20 +194,27 @@ function NumResults({ movies }) {
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
-  useEffect(() => {
-    function callback(e) {
-      if (document.activeElement === inputEl.current) return;
+  useKey("Enter", function () {
+    if (document.activeElement === inputEl.current) return;
 
-      if (e.code === "Enter") {
-        inputEl.current.focus();
-        setQuery("");
-      }
-    }
+    inputEl.current.focus();
+    setQuery("");
+  });
 
-    document.addEventListener("keydown", callback);
+  // useEffect(() => {
+  //   function callback(e) {
+  //     if (document.activeElement === inputEl.current) return;
 
-    return () => document.addEventListener("keydown", callback);
-  }, []);
+  //     if (e.code === "Enter") {
+  //       inputEl.current.focus();
+  //       setQuery("");
+  //     }
+  //   }
+
+  //   document.addEventListener("keydown", callback);
+
+  //   return () => document.addEventListener("keydown", callback);
+  // }, []);
 
   return (
     <input
@@ -311,19 +319,21 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onCloseMovie();
   };
 
-  useEffect(() => {
-    const callback = (e) => {
-      if (e.code === "Escape") {
-        onCloseMovie();
-      }
-    };
+  useKey("Escape", onCloseMovie);
 
-    document.addEventListener("keydown", callback);
+  // useEffect(() => {
+  //   const callback = (e) => {
+  //     if (e.code === "Escape") {
+  //       onCloseMovie();
+  //     }
+  //   };
 
-    return () => {
-      document.removeEventListener("keydown", callback);
-    };
-  }, []);
+  //   document.addEventListener("keydown", callback);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", callback);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const getMovieDetails = async () => {
